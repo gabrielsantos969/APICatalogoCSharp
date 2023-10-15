@@ -20,7 +20,8 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _context.Produtos.ToList();
+            //Aqui ele só esta trazendo 10 produtos, pois se tiver milhares de produtos, ira sobrecarregar e o AsNoTracking ajuda nos GET para melhorar o desempenho
+            var produtos = _context.Produtos.Take(10).AsNoTracking().ToList();
             if(produtos is null)
             {
                 return NotFound("Produtos não encontrados...");
@@ -32,6 +33,7 @@ namespace APICatalogo.Controllers
         public ActionResult<Produto> Get(int id)
         {
             var produto = _context.Produtos.FirstOrDefault(p=> p.ProdutoId == id);
+
             if(produto is null)
             {
                 return NotFound("Produto não encontrado...");

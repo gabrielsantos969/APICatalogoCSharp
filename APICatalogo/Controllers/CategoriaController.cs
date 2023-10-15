@@ -20,21 +20,32 @@ namespace APICatalogo.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
+            //Essa é a forma sem um where, que traz todos os produtos, se tiver milhares, sobrecarrega o sistema
+            //return _context.Categorias.Include(p => p.Produtos).AsNoTracking().ToList();
 
-            return _context.Categorias.Include(p => p.Produtos).ToList();
+
+            return _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 5).AsNoTracking().ToList();
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _context.Categorias.ToList();
+            var categorias = _context.Categorias.AsNoTracking().ToList();
 
-            if(categorias is null)
+            try
             {
-                return NotFound("Nenhuma categoria encontrada...");
+                if(categorias is null)
+                {
+                    return NotFound("Nenhuma categoria encontrada...");
+                }
+
+                return Ok(categorias);
+
+            }catch(Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema a tratar sua solicitacao");
             }
 
-            return Ok(categorias);
         }
 
 
